@@ -20,9 +20,19 @@ ifstream ifs;
 //全局变量区
 int tot = 0;
 int tor = 0;
+int ok1 = 1;
+int ok2 = 1;
+
+//std::mutex stop;
+//bool PoolFlag = true;
+//int length = 0;
 
 
-std::mutex stop;
+
+
+
+
+
 
 struct message
 {
@@ -34,8 +44,6 @@ struct message
 }e1;
 
 
-int ok1 = 1;
-int ok2 = 1;
 
 
 
@@ -95,7 +103,191 @@ int dowsload_numer = 0;
 
 
 
-void main()
+
+
+
+//void threadPool(string file_P, string str_a[50000], string str_cba[5000]) {
+//	stop.lock();
+//	this_thread::sleep_for(chrono::milliseconds(10));
+//	cout << "线程ID" << this_thread::get_id() << endl;
+//	ftplib* ftp = new ftplib();
+//	e1.connect_error = ftp->Connect("120.26.51.161:21");
+//	//ftp->Login("WZ_AI_USER", "b*qaK0BJSmeVPvi");
+//	e1.login_error = ftp->Login("WZ_AI_USER", "b*qaK0BJSmeVPvi");
+//	char file_a[256];
+//	strcpy(file_a, file_P.c_str());
+//	//e1.Mkdir_error = ftp->Mkdir(file_a);
+//	e1.Chdir_error = ftp->Chdir(file_a);
+//	if (e1.Chdir_error == 0)
+//	{
+//		stop.lock();
+//		cout << "线程进入FTP下载文件夹失败" << endl;
+//		stop.unlock();
+//	}
+//
+//	for (int i = 0; i < 1; i++)
+//	{
+//
+//		for (int i = 0; i < 2; i++)
+//		{
+//			if (i < 2 - 1)
+//			{
+//				printf("\r上传中[%.2lf%%]:", i * 100.0 / (2 - 1));
+//
+//			}
+//			else
+//			{
+//				printf("\r上传完成[%.2lf%%]:", i * 100.0 / (2 - 1));
+//			}
+//			int show_num = i * 20 / 2;
+//			for (int j = 1; j <= show_num; j++)
+//			{
+//				setcolor(11);
+//				std::cout << "█";
+//				setcolor(15);
+//				Sleep(1);
+//			}
+//
+//		}
+//		std::cout << std::endl;
+//		char file_path[50000] = { 0 };
+//		char server_file_path[5000] = { 0 };
+//		memcpy(server_file_path, str_cba[i].c_str(), str_cba[i].size());
+//		memcpy(file_path, str_a[i].c_str(), str_a[i].size());
+//		//memcpy(file_path, process_number_a[i].c_str(), process_number_a[i].size());
+//		//memcpy(server_file_path, process_number_b[i].c_str(), process_number_b[i].size());
+//		e1.upload_error = ftp->Put(file_path, server_file_path, ftplib::image);
+//		cout << "当前FTP服务器文件夹编号:" << file_P << endl;
+//		for (int i = 0; i < 1; i++)
+//		{
+//			dowsload_numer = dowsload_numer + 1;
+//			setcolor(14);
+//			cout << "当前上传文件数:" << dowsload_numer << endl;
+//			setcolor(3);
+//			cout << "本地上传目录文件总数:" << tot << endl;
+//			setcolor(15);
+//		}
+//		cout << "上传的文件名称:" << (const char*)file_path << endl;
+//		cout << "上传至服务器目录下名称:" << file_P << "\\" << server_file_path << endl;
+//		cout << "远程FTP反馈状态:" << e1.upload_error << endl;
+//		//Sleep(1000);
+//		if (e1.upload_error)
+//		{
+//			setcolor(1);
+//			cout << "训练数据文件上传成功" << endl;
+//			setcolor(2);
+//			cout << "本地路径:" << file_path << endl;
+//			setcolor(15);
+//		}
+//		else
+//		{
+//			setcolor(4);
+//			cout << "文件上传失败!" << endl;
+//			setcolor(15);
+//		}
+//	}
+//	ftp->Quit();
+//	stop.unlock();
+//}
+
+typedef struct
+{
+	string file;
+	string A;
+	string B;
+}TEMP;
+TEMP temp;
+
+mutex mu;//线程互斥对象
+bool PoolFlag = true;//true =继续 false=停止  传完了 这个要清空  flase
+int length = 0;
+void threadPool(TEMP data)//参数自己改
+{
+	mu.lock(); //同步数据锁 
+	//std::this_thread::sleep_for(std::chrono::milliseconds(100));//毫秒级延迟  可以注释掉
+	//std::cout << "线程ID:" << std::this_thread::get_id() << " 传入参数:" << data.file << "+" << data.A << "+" << data.B << std::endl;//可以注释掉
+	//data.file
+	//data.A
+	//data.B
+		ftplib* ftp = new ftplib();
+	e1.connect_error = ftp->Connect("120.26.51.161:21");
+	//ftp->Login("WZ_AI_USER", "b*qaK0BJSmeVPvi");
+	e1.login_error = ftp->Login("WZ_AI_USER", "b*qaK0BJSmeVPvi");
+	char file_a[256];
+	strcpy(file_a, data.file.c_str());
+	//e1.Mkdir_error = ftp->Mkdir(file_a);
+	e1.Chdir_error = ftp->Chdir(file_a);
+	if (e1.Chdir_error==0)
+	{	
+		cout << "线程进入FTP下载文件夹失败" << endl;	
+	}
+
+	for (int i = 0; i < 1; i++)
+	{
+
+		for (int i = 0; i < 2; i++)
+		{
+			if (i < 2 - 1)
+			{
+				printf("\r上传中[%.2lf%%]:", i * 100.0 / (2 - 1));
+
+			}
+			else
+			{
+				printf("\r上传完成[%.2lf%%]:", i * 100.0 / (2 - 1));
+			}
+			int show_num = i * 20 / 2;
+			for (int j = 1; j <= show_num; j++)
+			{
+				setcolor(11);
+				std::cout << "█";
+				setcolor(15);
+				Sleep(1);
+			}
+
+		}
+		std::cout << std::endl;
+		char file_path[50000] = { 0 };
+		char server_file_path[5000] = { 0 };
+		memcpy(server_file_path, data.B.c_str(), data.B.size());
+		memcpy(file_path, data.A.c_str(), data.A.size());
+		//memcpy(file_path, process_number_a[i].c_str(), process_number_a[i].size());
+		//memcpy(server_file_path, process_number_b[i].c_str(), process_number_b[i].size());
+		e1.upload_error = ftp->Put(file_path, server_file_path, ftplib::image);
+		cout << "当前FTP服务器文件夹编号:" << data.file << endl;
+		for (int i = 0; i < 1; i++)
+		{
+			dowsload_numer = dowsload_numer + 1;
+			setcolor(14);
+			cout << "当前上传文件数:" << dowsload_numer << endl;
+			setcolor(3);
+			cout << "本地上传目录文件总数:" << tot << endl;
+			setcolor(15);
+		}
+		cout << "上传的文件名称:" << (const char*)file_path << endl;
+		cout << "上传至服务器目录下名称:" << data.file << "<--" << server_file_path << endl;
+		cout << "远程FTP反馈状态:" << e1.upload_error << endl;
+		//Sleep(1000);
+		if (e1.upload_error)
+		{
+			setcolor(1);
+			cout << "训练数据文件上传成功" << endl;
+			setcolor(2);
+			cout << "本地路径:" << file_path << endl;
+			setcolor(15);
+		}
+		else
+		{
+			setcolor(4);
+			cout << "文件上传失败!" << endl;
+			setcolor(15);
+		}
+	}
+	ftp->Quit();
+	mu.unlock();//解除锁定  
+}
+
+int main()
 {
 	ftplib* ftp = new ftplib();
 	e1.connect_error=ftp->Connect("120.26.51.161:21");
@@ -198,13 +390,11 @@ void main()
 	while (getline(ifrs, str_abc,'\n')) {
 		for (int i=0;i<1;i++)
 		{
-			str_cba[tot++] = str_abc;
+			str_cba[tot++] = str_abc;//服务器文件参数
 		}
 	}	
 	ifrs.close();
 	
-
-		
 		//int tor = 0;
 		string str;
 		string str_a[50000];
@@ -213,29 +403,41 @@ void main()
 		{
 			for (int i = 0; i < 1; i++)
 			{
-				str_a[tor++] = str;
+				str_a[tor++] = str;//本地上传文件路径
 			}
 		}
 		ifs.close();
+		
+		//char file_path[50000] = { 0 };
+		//char server_file_path[5000] = { 0 };
+		// 
+		//for (int x = 0; x < tor; x++)
+		//{
+		//	cout <<"输出测试:" << str_a[x] << "+" << str_cba[x] << endl;
+		//}
 
-		/*for (int i = 0; i < 1; i++)
+
+		length = 0;
+		while (PoolFlag)
 		{
-			str_cba[i] = process_number_b[i];
-			str_a[i] = process_number_a[i];
-		}*/
-		
-		char file_path[50000] = { 0 };
-		char server_file_path[5000] = { 0 };
-
-
+			std::thread threadID[10];
+			for (int i = 0; i < 10; i++)//创建线程池
+			{
+				temp.file = file_P;
+				temp.A = str_a[length];
+				temp.B = str_cba[length];
+				//std::cout << " 数据:" << temp.file << "+" << temp.A << "+" << temp.B << std::endl;//可以注释掉
+				threadID[i] = std::thread(threadPool, temp);//后面参数
+				if (length < (tor))length++;
+				else PoolFlag = false;//	PoolFlag = false;
+			}
+			for (auto& t : threadID)
+				t.join();
+		}
 	
-		//	控制模块(file_P, str_a, str_cba);
-			
 		
-	
-			
 		
-
+		/*
 		for (int i = 0; i < tor; i++)
 		{
 			
@@ -296,6 +498,7 @@ void main()
 				setcolor(15);
 			}
 		}
+		
 		setcolor(2);
 		cout << "[消息]:所有训练图片以成功上传FTP服务器!" << endl;
 		cout << "[消息]:现在正在上传";
@@ -340,9 +543,9 @@ void main()
 			cout << "WARNING:请注意控制台是否多次上传操作文件，如果有就是上传成功了！" << endl;
 			setcolor(15);
 		}
-			
+	*/
 
-	
+	return 0;
 	system("pause");
 	//ftp->Quit();
 }
@@ -352,125 +555,125 @@ void main()
 
 
 
-int WINAPI_MANY_PROCESS(string file_box, char file_path[50000], char server_file_path[5000]) {
-	ok1 = 0;
-	ftplib* ftp = new ftplib();
-	e1.connect_error = ftp->Connect("120.26.51.161:21");
-	//ftp->Login("WZ_AI_USER", "b*qaK0BJSmeVPvi");
-	e1.login_error = ftp->Login("WZ_AI_USER", "b*qaK0BJSmeVPvi");
-	char file_a[256];
-	strcpy(file_a, file_box.c_str());
-	//e1.Mkdir_error = ftp->Mkdir(file_a);
-	e1.Chdir_error = ftp->Chdir(file_a);
-	if (e1.Chdir_error==0)
-	{
-		stop.lock();
-		cout << "线程进入FTP下载文件夹失败" << endl;
-		stop.unlock();
-	}
+//int WINAPI_MANY_PROCESS(string file_box, char file_path[50000], char server_file_path[5000]) {
+//	ok1 = 0;
+//	ftplib* ftp = new ftplib();
+//	e1.connect_error = ftp->Connect("120.26.51.161:21");
+//	//ftp->Login("WZ_AI_USER", "b*qaK0BJSmeVPvi");
+//	e1.login_error = ftp->Login("WZ_AI_USER", "b*qaK0BJSmeVPvi");
+//	char file_a[256];
+//	strcpy(file_a, file_box.c_str());
+//	//e1.Mkdir_error = ftp->Mkdir(file_a);
+//	e1.Chdir_error = ftp->Chdir(file_a);
+//	if (e1.Chdir_error==0)
+//	{
+//		stop.lock();
+//		cout << "线程进入FTP下载文件夹失败" << endl;
+//		stop.unlock();
+//	}
+//
+//	for (int i = 0; i < 1; i++)
+//	{
+//
+//		for (int i = 0; i < 2; i++)
+//		{
+//			if (i < 2 - 1)
+//			{
+//				printf("\r上传中[%.2lf%%]:", i * 100.0 / (2 - 1));
+//
+//			}
+//			else
+//			{
+//				printf("\r上传完成[%.2lf%%]:", i * 100.0 / (2 - 1));
+//			}
+//			int show_num = i * 20 / 2;
+//			for (int j = 1; j <= show_num; j++)
+//			{
+//				setcolor(11);
+//				std::cout << "█";
+//				setcolor(15);
+//				Sleep(1);
+//			}
+//
+//		}
+//		std::cout << std::endl;
+//		//char file_path[50000] = { 0 };
+//		//char server_file_path[5000] = { 0 };
+//		//memcpy(server_file_path, server_b[i].c_str(), server_b[i].size());
+//		//memcpy(file_path, local_a[i].c_str(), local_a[i].size());
+//		//memcpy(file_path, process_number_a[i].c_str(), process_number_a[i].size());
+//		//memcpy(server_file_path, process_number_b[i].c_str(), process_number_b[i].size());
+//		e1.upload_error = ftp->Put(file_path, server_file_path, ftplib::image);
+//		cout << "当前FTP服务器文件夹编号:" << file_P << endl;
+//		for (int i = 0; i < 1; i++)
+//		{
+//			dowsload_numer = dowsload_numer + 1;
+//			setcolor(14);
+//			cout << "当前上传文件数:" << dowsload_numer << endl;
+//			setcolor(3);
+//			cout << "本地上传目录文件总数:" << tot << endl;
+//			setcolor(15);
+//		}
+//		cout << "上传的文件名称:" << (const char*)file_path << endl;
+//		cout << "上传至服务器目录下名称:" << file_P << "\\" << server_file_path << endl;
+//		cout << "远程FTP反馈状态:" << e1.upload_error << endl;
+//		//Sleep(1000);
+//		if (e1.upload_error)
+//		{
+//			setcolor(1);
+//			cout << "训练数据文件上传成功" << endl;
+//			setcolor(2);
+//			cout << "本地路径:" << file_path << endl;
+//			setcolor(15);
+//		}
+//		else
+//		{
+//			setcolor(4);	
+//			cout << "文件上传失败!" << endl;
+//			setcolor(15);
+//		}
+//	}
+//	ftp->Quit();
+//	ok1 = 1;
+//	return 0;
+//}
 
-	for (int i = 0; i < 1; i++)
-	{
-
-		for (int i = 0; i < 2; i++)
-		{
-			if (i < 2 - 1)
-			{
-				printf("\r上传中[%.2lf%%]:", i * 100.0 / (2 - 1));
-
-			}
-			else
-			{
-				printf("\r上传完成[%.2lf%%]:", i * 100.0 / (2 - 1));
-			}
-			int show_num = i * 20 / 2;
-			for (int j = 1; j <= show_num; j++)
-			{
-				setcolor(11);
-				std::cout << "█";
-				setcolor(15);
-				Sleep(1);
-			}
-
-		}
-		std::cout << std::endl;
-		//char file_path[50000] = { 0 };
-		//char server_file_path[5000] = { 0 };
-		//memcpy(server_file_path, server_b[i].c_str(), server_b[i].size());
-		//memcpy(file_path, local_a[i].c_str(), local_a[i].size());
-		//memcpy(file_path, process_number_a[i].c_str(), process_number_a[i].size());
-		//memcpy(server_file_path, process_number_b[i].c_str(), process_number_b[i].size());
-		e1.upload_error = ftp->Put(file_path, server_file_path, ftplib::image);
-		cout << "当前FTP服务器文件夹编号:" << file_P << endl;
-		for (int i = 0; i < 1; i++)
-		{
-			dowsload_numer = dowsload_numer + 1;
-			setcolor(14);
-			cout << "当前上传文件数:" << dowsload_numer << endl;
-			setcolor(3);
-			cout << "本地上传目录文件总数:" << tot << endl;
-			setcolor(15);
-		}
-		cout << "上传的文件名称:" << (const char*)file_path << endl;
-		cout << "上传至服务器目录下名称:" << file_P << "\\" << server_file_path << endl;
-		cout << "远程FTP反馈状态:" << e1.upload_error << endl;
-		//Sleep(1000);
-		if (e1.upload_error)
-		{
-			setcolor(1);
-			cout << "训练数据文件上传成功" << endl;
-			setcolor(2);
-			cout << "本地路径:" << file_path << endl;
-			setcolor(15);
-		}
-		else
-		{
-			setcolor(4);	
-			cout << "文件上传失败!" << endl;
-			setcolor(15);
-		}
-	}
-	ftp->Quit();
-	ok1 = 1;
-	return 0;
-}
-
-char file_path[5000];
-char server_file_path[5000];
+//char file_path[5000];
+//char server_file_path[5000];
 
 
-int 控制模块(string file_P,string str_a[50000], string str_cba[5000]) {
-
-	stop.lock();
-	for (int i = 0; i < tot;)
-	{
-		
-	label: 
-		
-		char file_path[50000] = { 0 };
-		char server_file_path[5000] = { 0 };
-		memcpy(server_file_path, str_cba[i].c_str(), str_cba[i].size());
-		memcpy(file_path, str_a[i].c_str(), str_a[i].size());
-
-		if (ok1)
-		{
-			thread t1(WINAPI_MANY_PROCESS, file_P, file_path, server_file_path);
-			
-			t1.join();
-			i++;
-			goto label;
-		}
-		if (ok2)
-		{
-			thread t2(WINAPI_MANY_PROCESS, file_P, file_path, server_file_path);
-			t2.join();
-			i++;
-			goto label;
-		}
-		
-	} 
-	
-		
-	}
+//int 控制模块(string file_P,string str_a[50000], string str_cba[5000]) {
+//
+//	stop.lock();
+//	for (int i = 0; i < tot;)
+//	{
+//		
+//	label: 
+//		
+//		char file_path[50000] = { 0 };
+//		char server_file_path[5000] = { 0 };
+//		memcpy(server_file_path, str_cba[i].c_str(), str_cba[i].size());
+//		memcpy(file_path, str_a[i].c_str(), str_a[i].size());
+//
+//		if (ok1)
+//		{
+//			thread t1(WINAPI_MANY_PROCESS, file_P, file_path, server_file_path);
+//			
+//			t1.join();
+//			i++;
+//			goto label;
+//		}
+//		if (ok2)
+//		{
+//			thread t2(WINAPI_MANY_PROCESS, file_P, file_path, server_file_path);
+//			t2.join();
+//			i++;
+//			goto label;
+//		}
+//		
+//	} 
+//	
+//		
+//	}
 
 

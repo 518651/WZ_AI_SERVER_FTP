@@ -1,0 +1,99 @@
+王者主页面->排位页面
+/dev/input/event6: 0003 0036 00000518
+/dev/input/event6: 0003 0035 00000324
+
+x,y坐标
+0036,0035
+(1304 804)
+
+排位模拟点击 adb shell input tap 1304 804
+
+
+王者主页面->对战页面
+对战模拟点击 adb shell input tap   
+/dev/input/event6: 0003 0036 0000036d
+/dev/input/event6: 0003 0035 00000326
+
+x,y坐标
+0036,0035
+(877,806)
+对战模拟点击 adb shell input tap 877 806
+
+
+对战页面->5V5对战
+对战模拟点击 adb shell input tap   
+/dev/input/event6: 0003 0036 000001a7
+/dev/input/event6: 0003 0035 00000254
+
+x,y坐标
+0036,0035
+(423,596)
+5V5对战模拟点击 adb shell input tap 423 596
+
+对战页面->人机匹配对战
+对战模拟点击 adb shell input tap   
+/dev/input/event6: 0003 0035 00000225
+/dev/input/event6: 0003 0036 00000490
+
+x,y坐标
+0036,0035
+(1168,549)
+人机匹配对战模拟点击 adb shell input tap 1168 549
+
+
+人机对战->荣耀黄金IV
+/dev/input/event6: 0003 0036 0000049c
+/dev/input/event6: 0003 0035 000001a5
+
+x,y坐标
+0036,0035
+(1180,421)
+人机匹配对战模拟点击 adb shell input tap 1180 421
+
+
+人机对战->荣耀黄金IV->开始练习
+/dev/input/event6: 0003 0036 000006ea
+/dev/input/event6: 0003 0035 0000034b
+
+x,y坐标
+0036,0035
+(1770,843)
+人机匹配对战模拟点击 adb shell input tap 1770 843
+
+
+开始练习->滑行选择英雄(后羿)
+x1,y1
+/dev/input/event6: 0003 0036 00000094
+/dev/input/event6: 0003 0035 00000361
+148 865
+x2,y2
+/dev/input/event6: 0003 0036 0000009a
+/dev/input/event6: 0003 0035 00000056
+154  86
+
+x1,y2坐标----------->x2,y2坐标
+0036,0035		0036,0035
+(1974,913)		(1980,280)
+选择英雄模拟点击 adb shell input swipe  148 755 154  86
+
+
+滑行选择英雄(后羿)---->选择英雄
+/dev/input/event6: 0003 0036 0000002b
+/dev/input/event6: 0003 0035 000003e1
+43 993
+
+选择英雄 adb shell input tap 43 993
+
+进行一次确认
+/dev/input/event6: 0003 0036 000007c9
+/dev/input/event6: 0003 0035 00000411
+1993 1041
+
+进行一次确认  adb shell input tap 1993 1041
+
+
+
+
+
+
+
