@@ -1,13 +1,50 @@
 #include <iostream>
+#include <thread>
+#include <chrono>
 #include <stdio.h>
 #include <fstream>
 #include <string>
+//#include <Windows.h>
+#include <future>
+#include <ctime>
 #include "ftplib.h"
 
-#pragma warning(disable :4996)
 
 using namespace std;
+#pragma warning(disable :4996)
+
+
+
 ifstream ifs;
+
+//全局变量区
+int tot = 0;
+int tor = 0;
+
+
+std::mutex stop;
+
+struct message
+{
+	int connect_error;
+	int login_error;
+	int upload_error;
+	int Mkdir_error;
+	int Chdir_error;
+}e1;
+
+
+int ok1 = 1;
+int ok2 = 1;
+
+
+
+
+
+
+
+
+
 
 string password()
 {
@@ -32,16 +69,16 @@ string password()
 	return strResult.c_str();
 }
 
+string file_P;
+//struct  WIN_32_DOUBLE_PROCESS
+//{
+//	string process_number_a[50000] = { 0 };
+//	string process_number_b[5000]={0};
+//}many_process;
 
 
-struct message
-{
-	int connect_error;
-	int login_error;
-	int upload_error;
-	int Mkdir_error;
-	int Chdir_error;
-}e1;
+int WINAPI_MANY_PROCESS(string file_box, char file_path[50000], char server_file_path[5000]);
+
 
 
 void setcolor(unsigned short color)
@@ -51,10 +88,11 @@ void setcolor(unsigned short color)
 }
 
 
+int 控制模块(string file_P, string str_a[50000], string str_cba[5000]);
 
-//char server_file_path[5000] = {0};
-int download_number_add=1;
 int dowsload_numer = 0;
+
+
 
 
 void main()
@@ -111,6 +149,7 @@ void main()
 	setcolor(15);
 	string file_P = password();
 	char file_a[256];
+	file_P = password();
 	strcpy(file_a, file_P.c_str());
 	e1.Mkdir_error = ftp->Mkdir(file_a);
 	if (e1.Mkdir_error)
@@ -145,7 +184,7 @@ void main()
 		cout << "请稍等重新尝试!" << endl;
 		setcolor(15);
 		Sleep(15);
-		//exit(0);
+		exit(0);
 	}
 	cout << "正在读取配置文件" << endl;
 	Sleep(1);
@@ -154,7 +193,7 @@ void main()
 	
 	string str_abc;
 	string str_cba[5000];
-	int tot=0;
+	//int tot=0;
 	ifstream ifrs("WZ_AI_FILE_NUMBER.txt", ios::in);
 	while (getline(ifrs, str_abc,'\n')) {
 		for (int i=0;i<1;i++)
@@ -165,14 +204,10 @@ void main()
 	ifrs.close();
 	
 
-	//memcpy(server_file_path, str_cba[i].c_str(), str_cba[i].size());
-	//e1.upload_error = ftp->Put(file_path, server_file_path, ftplib::image);
-
 		
-		int tor = 0;
+		//int tor = 0;
 		string str;
-		string str_a[5000];
-		//char file_path[5000] = {0};
+		string str_a[50000];
 		ifstream ifs("WZ_AI_config.txt", ios::in);
 		while (getline(ifs, str,'\n'))
 		{
@@ -183,24 +218,40 @@ void main()
 		}
 		ifs.close();
 
+		/*for (int i = 0; i < 1; i++)
+		{
+			str_cba[i] = process_number_b[i];
+			str_a[i] = process_number_a[i];
+		}*/
 		
+		char file_path[50000] = { 0 };
+		char server_file_path[5000] = { 0 };
+
+
+	
+		//	控制模块(file_P, str_a, str_cba);
+			
 		
+	
+			
+		
+
 		for (int i = 0; i < tor; i++)
 		{
 			
-			for (int i = 0; i < tot; i++)
+			for (int i = 0; i < 2; i++)
 			{
 				if (i < tot - 1)
 				{
-					printf("\r上传中[%.2lf%%]:", i * 100.0 / (tot - 1));
+					printf("\r上传中[%.2lf%%]:", i * 100.0 / (2 - 1));
 					
 					
 				}
 				else
 				{
-					printf("\r上传完成[%.2lf%%]:", i * 100.0 / (tot - 1));
+					printf("\r上传完成[%.2lf%%]:", i * 100.0 / (2 - 1));
 				}
-				int show_num = i * 20 / tot;
+				int show_num = i * 20 / 2;
 				for (int j = 1; j <= show_num; j++)
 				{
 					setcolor(11);
@@ -247,7 +298,11 @@ void main()
 		}
 		setcolor(2);
 		cout << "[消息]:所有训练图片以成功上传FTP服务器!" << endl;
-		cout << "[消息]:现在正在上传操作文件........." << endl;
+		cout << "[消息]:现在正在上传";
+		setcolor(13);
+		cout << "操作文件";
+		setcolor(2);
+		cout<<"........." << endl;
 		cout << "请稍等....." << endl;
 		cout << "Loading........" << endl;
 
@@ -264,7 +319,7 @@ void main()
 		{
 			path_massage=path_zero + path_add_name;
 		}
-		ifrs.close();
+		ifrzs.close();
 		strcpy(karl, path_massage.c_str());
 		strcpy(karl_name, aaa_name.c_str());
 		e1.upload_error = ftp->Put(karl, karl_name, ftplib::image);
@@ -289,8 +344,133 @@ void main()
 
 	
 	system("pause");
-	ftp->Quit();
+	//ftp->Quit();
 }
 
+
+
+
+
+
+int WINAPI_MANY_PROCESS(string file_box, char file_path[50000], char server_file_path[5000]) {
+	ok1 = 0;
+	ftplib* ftp = new ftplib();
+	e1.connect_error = ftp->Connect("120.26.51.161:21");
+	//ftp->Login("WZ_AI_USER", "b*qaK0BJSmeVPvi");
+	e1.login_error = ftp->Login("WZ_AI_USER", "b*qaK0BJSmeVPvi");
+	char file_a[256];
+	strcpy(file_a, file_box.c_str());
+	//e1.Mkdir_error = ftp->Mkdir(file_a);
+	e1.Chdir_error = ftp->Chdir(file_a);
+	if (e1.Chdir_error==0)
+	{
+		stop.lock();
+		cout << "线程进入FTP下载文件夹失败" << endl;
+		stop.unlock();
+	}
+
+	for (int i = 0; i < 1; i++)
+	{
+
+		for (int i = 0; i < 2; i++)
+		{
+			if (i < 2 - 1)
+			{
+				printf("\r上传中[%.2lf%%]:", i * 100.0 / (2 - 1));
+
+			}
+			else
+			{
+				printf("\r上传完成[%.2lf%%]:", i * 100.0 / (2 - 1));
+			}
+			int show_num = i * 20 / 2;
+			for (int j = 1; j <= show_num; j++)
+			{
+				setcolor(11);
+				std::cout << "█";
+				setcolor(15);
+				Sleep(1);
+			}
+
+		}
+		std::cout << std::endl;
+		//char file_path[50000] = { 0 };
+		//char server_file_path[5000] = { 0 };
+		//memcpy(server_file_path, server_b[i].c_str(), server_b[i].size());
+		//memcpy(file_path, local_a[i].c_str(), local_a[i].size());
+		//memcpy(file_path, process_number_a[i].c_str(), process_number_a[i].size());
+		//memcpy(server_file_path, process_number_b[i].c_str(), process_number_b[i].size());
+		e1.upload_error = ftp->Put(file_path, server_file_path, ftplib::image);
+		cout << "当前FTP服务器文件夹编号:" << file_P << endl;
+		for (int i = 0; i < 1; i++)
+		{
+			dowsload_numer = dowsload_numer + 1;
+			setcolor(14);
+			cout << "当前上传文件数:" << dowsload_numer << endl;
+			setcolor(3);
+			cout << "本地上传目录文件总数:" << tot << endl;
+			setcolor(15);
+		}
+		cout << "上传的文件名称:" << (const char*)file_path << endl;
+		cout << "上传至服务器目录下名称:" << file_P << "\\" << server_file_path << endl;
+		cout << "远程FTP反馈状态:" << e1.upload_error << endl;
+		//Sleep(1000);
+		if (e1.upload_error)
+		{
+			setcolor(1);
+			cout << "训练数据文件上传成功" << endl;
+			setcolor(2);
+			cout << "本地路径:" << file_path << endl;
+			setcolor(15);
+		}
+		else
+		{
+			setcolor(4);	
+			cout << "文件上传失败!" << endl;
+			setcolor(15);
+		}
+	}
+	ftp->Quit();
+	ok1 = 1;
+	return 0;
+}
+
+char file_path[5000];
+char server_file_path[5000];
+
+
+int 控制模块(string file_P,string str_a[50000], string str_cba[5000]) {
+
+	stop.lock();
+	for (int i = 0; i < tot;)
+	{
+		
+	label: 
+		
+		char file_path[50000] = { 0 };
+		char server_file_path[5000] = { 0 };
+		memcpy(server_file_path, str_cba[i].c_str(), str_cba[i].size());
+		memcpy(file_path, str_a[i].c_str(), str_a[i].size());
+
+		if (ok1)
+		{
+			thread t1(WINAPI_MANY_PROCESS, file_P, file_path, server_file_path);
+			
+			t1.join();
+			i++;
+			goto label;
+		}
+		if (ok2)
+		{
+			thread t2(WINAPI_MANY_PROCESS, file_P, file_path, server_file_path);
+			t2.join();
+			i++;
+			goto label;
+		}
+		
+	} 
+	
+		
+	}
 
 
