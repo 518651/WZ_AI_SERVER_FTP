@@ -5,6 +5,8 @@
 #include <fstream>
 #include <string>
 //#include <Windows.h>
+#include <stdlib.h>
+#include <WinSock2.h>
 #include <future>
 #include <ctime>
 #include "ftplib.h"
@@ -12,7 +14,7 @@
 
 using namespace std;
 #pragma warning(disable :4996)
-
+#pragma comment(lib,"ws2_32.lib")
 
 
 ifstream ifs;
@@ -23,6 +25,9 @@ int tor = 0;
 int ok1 = 1;
 int ok2 = 1;
 
+//SOCKET全局变量区
+int server_say = 0;
+int client_say = 0;
 
 const  int size_b = 1024; // 定义MB的计算常量
 
@@ -32,6 +37,10 @@ char path[] = "模型_策略梯度_丙N3";      //FTP服务器下载文件
 char path_name[] = "模型_策略梯度_丙N3";
 char load_file[] = "模型_策略梯度_丙N3";
 char day[] = { NULL };
+
+
+
+
 
 string 判断开关;
 
@@ -203,6 +212,9 @@ int main()
 			cout << "选择3:     AI环境文件下载                            " << endl;
 			cout << "选择4:     启动全自动脚本                              " << endl;
 			cout << "选择5:      训练文件上传+启动全自动脚本      " << endl;
+			setcolor(2);
+			cout << "选择6:      查询AI工程详细情况                    " << endl;
+			setcolor(9);
 			cout << "选择0:         退出程序                                " << endl;
 			setcolor(4);
 			cout << ">>>>>>欢迎使用王者AI训练数据共享平台<<<<<<" << endl;
@@ -397,8 +409,9 @@ int main()
 
 
 			return 0;
-			system("pause");
+			
 			ftp->Quit();
+			system("pause");
 		}
 		break;
 	case 2:
@@ -475,7 +488,13 @@ int main()
 		break;
 		case 3:
 		{
-			cout << "暂时未开发!" << endl;
+			cout << "请确认您要下载的环境选项:" << endl;
+			cout << "1.Anaconda3-2021.05-Windows-x86_64.exe" << endl;
+			cout << "2.PyCharm 2021.1.2 IDE(可以通过选项6获取激活秘钥)" << endl;
+			cout << "CUDA 11.1" << endl;
+			cout << "3.王者AI环境(pytorch对应版本的CUDA:11.1)" << endl;
+			cout << "++++++++++++++++++++++++++++++++++" << endl;
+		
 		}
 	break;
 
@@ -516,6 +535,71 @@ int main()
 				cout << "程序已完成自动开局!" << endl;
 		}
 		break;
+		case 5:
+		{
+			setcolor(4);
+			cout << "抱歉!因技术和开发团队等原因，此功能暂未开放!" << endl;
+			setcolor(15);
+		}
+		break;
+		case 6:
+			{
+				WSADATA chushihua;
+				WSAStartup(MAKEWORD(2, 2), &chushihua);
+				SOCKET socket=(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+				sockaddr_in socket_addr;
+				memset(&socket_addr, 0, sizeof(socket_addr));
+				socket_addr.sin_family = PF_INET; 
+				socket_addr.sin_addr.s_addr = inet_addr("120.26.51.161");
+				socket_addr.sin_port = htons(1200);
+				if (connect(socket, (SOCKADDR*)&socket_addr, sizeof(SOCKADDR))==SOCKET_ERROR)
+				{
+					cout << "服务器连接失败!" << endl;
+					//WSACleanup();
+				}
+				else
+				{
+					cout << "连接服务器成功!" << endl;
+				}
+				char szBuffer[MAXBYTE] = { 0 };
+				bool server_socket_clock="关闭连接";
+				bool server_off = "关闭连接";
+				while (szBuffer != 0)
+				{
+					server_say = recv(socket, szBuffer, MAXBYTE, NULL);
+					if (server_say < 0)
+					{
+						setcolor(4);
+						cout << "接收AI数据中心终端数据失败!" << endl;
+						cout << "请重新连接!" << endl;
+						setcolor(15);
+						break;
+					}
+					setcolor(2);
+					cout << "来自AI训练数据中心的回复:" << szBuffer << endl;
+					setcolor(14);
+					cout << "您:";
+					cin >> szBuffer;
+					client_say = send(socket, szBuffer, strlen(szBuffer)+sizeof(char),NULL);
+					if (client_say<0)
+					{
+						setcolor(4);
+						cout << "发送信息至AI训练数据中心失败！" << endl;
+						cout << "请重新连接!" << endl;
+						setcolor(15);
+						break;
+					}
+				}
+				
+
+
+
+
+				
+				closesocket(socket);
+				WSACleanup();
+			}
+			break;
 	default:
 		cout << "error!没有该选项,请重新选择!" << endl;
 		break;
@@ -524,7 +608,7 @@ int main()
 }
 
 
-	
+ system("pause");
 }
 
 
